@@ -35,8 +35,6 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
-    export http_proxy="http://172.16.2.149:10809" && \
-    export https_proxy="http://172.16.2.149:10809" && \
     apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
     apt-get install -yqq \
