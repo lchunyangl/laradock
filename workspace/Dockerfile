@@ -55,8 +55,6 @@ ENV PGID ${PGID}
 
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
-    export http_proxy="http://172.16.2.151:10809" && \
-    export https_proxy="http://172.16.2.151:10809" && \
     apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
     groupadd -g ${PGID} laradock && \
@@ -542,8 +540,6 @@ RUN if [ ${INSTALL_GEARMAN} = true ]; then \
 ARG INSTALL_PHPREDIS=false
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
-    export http_proxy="http://172.16.2.151:10809" && \
-    export https_proxy="http://172.16.2.151:10809" && \
     apt-get install -yqq php${LARADOCK_PHP_VERSION}-redis \
 ;fi
 
@@ -1668,3 +1664,5 @@ RUN apt-get clean && \
 
 # Set default work directory
 WORKDIR /var/www
+
+EXPOSE 6001

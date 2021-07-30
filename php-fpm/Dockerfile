@@ -583,6 +583,8 @@ ENV OCI_INCLUDE_DIR="/opt/oracle/instantclient_12_1/sdk/include"
 ENV OCI_VERSION=12
 
 RUN if [ ${INSTALL_OCI8} = true ]; then \
+#    export http_proxy="http://172.16.2.104:11223" && \
+#    export https_proxy="http://172.16.2.104:11223" && \
     # Install wget
     apt-get install --no-install-recommends -yqq wget \
     # Install Oracle Instantclient
