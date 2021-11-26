@@ -194,6 +194,7 @@ services:
         - DOCKER_TLS_VERIFY=1
         - DOCKER_TLS_CERTDIR=/certs
         - DOCKER_CERT_PATH=/certs/client
+        - CHOKIDAR_USEPOLLING=true
       networks:
         - frontend
         - backend
@@ -809,6 +810,7 @@ services:
         - "${RABBITMQ_NODE_HOST_PORT}:5672"
         - "${RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672"
         - "${RABBITMQ_MANAGEMENT_HTTPS_HOST_PORT}:15671"
+        - "${RABBITMQ_WEB_STOMP_HOST_PORT}:15674"
       privileged: true
       hostname: laradock-rabbitmq
       volumes:

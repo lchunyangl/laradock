@@ -25,6 +25,7 @@ RUN apk --update add wget \
   build-base \
   libmcrypt-dev \
   libxml2-dev \
+  linux-headers \
   pcre-dev \
   zlib-dev \
   autoconf \
@@ -141,13 +142,19 @@ RUN if [ ${INSTALL_SOAP} = true ]; then \
 # Install MongoDB drivers:
 ARG INSTALL_MONGO=false
 RUN if [ ${INSTALL_MONGO} = true ]; then \
-  if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-  pecl install mongo; \
-  docker-php-ext-enable mongo; \
-  else \
-  pecl install mongodb; \
-  docker-php-ext-enable mongodb; \
-  fi; \
+    if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
+      pecl install mongo; \
+      docker-php-ext-enable mongo; \
+      php -m | grep -oiE '^mongo$'; \
+    else \
+      if [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70000" ]; then \
+        pecl install mongodb-1.9.2; \
+      else \
+        pecl install mongodb; \
+      fi; \
+      docker-php-ext-enable mongodb; \
+      php -m | grep -oiE '^mongodb$'; \
+    fi; \
   fi
 
 ###########################################################################
@@ -344,20 +351,21 @@ RUN if [ ${INSTALL_REDIS} = true ]; then \
 
 ARG INSTALL_SWOOLE=false
 
-RUN if [ ${INSTALL_SWOOLE} = true ]; then \
-  # Install Php Swoole Extension
-  if   [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "50600" ]; then \
-  echo '' | pecl -q install swoole-2.0.10; \
-  elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70000" ]; then \
-  echo '' | pecl -q install swoole-4.3.5; \
-  elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70100" ]; then \
-  echo '' | pecl -q install swoole-4.5.11; \
-  else \
-  echo '' | pecl -q install swoole; \
-  fi; \
-  docker-php-ext-enable swoole \
-  && php -m | grep -q 'swoole' \
-  ;fi
+RUN set -eux; \
+  if [ ${INSTALL_SWOOLE} = true ]; then \
+    # Install Php Swoole Extension
+    if   [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "50600" ]; then \
+      pecl install swoole-2.0.10; \
+    elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70000" ]; then \
+      pecl install swoole-4.3.5; \
+    elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70100" ]; then \
+      pecl install swoole-4.5.11; \
+    else \
+      pecl install swoole; \
+    fi; \
+    docker-php-ext-enable swoole; \
+    php -m | grep -oiE '^swoole$'; \
+  fi
 
 ###########################################################################
 # Taint EXTENSION
